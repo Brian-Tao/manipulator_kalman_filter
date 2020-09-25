@@ -70,28 +70,27 @@ link_directories(${BFL_LIBRARY_DIRS})
 
 
 ## Declare a cpp library
-add_library( assignment4
+add_library( manip_kalman_lib
   src/system_pdf.cpp
   src/measurement_pdf.cpp
   src/ekf_models.cpp
-  src/ekf.cpp
-  src/utilities.cpp )
+  src/ekf.cpp)
 
 ## Declare a cpp executable
 #add_executable( planner_node src/planner_node.cpp )
 #add_executable( planner_client src/planner_client.cpp )
 #add_executable( wgs84_node src/wgs84_node.cpp )
-# add_executable( ekf_node src/ekf_node.cpp )
+add_executable( ekf_node src/ekf_node.cpp )
 # add_executable( error_node src/error_node.cpp )
 
 ## Add cmake target dependencies of the executable/library
 ## as an example, message headers may need to be generated before nodes
-#add_dependencies( planner_node assignment4_generate_messages_cpp)
-#add_dependencies( planner_client assignment4_generate_messages_cpp)
+#add_dependencies( planner_node manip_kalman_generate_messages_cpp)
+#add_dependencies( planner_client manip_kalman_generate_messages_cpp)
 
 ## Specify libraries to link a library or executable target against
 #target_link_libraries( planner_node ${catkin_LIBRARIES} )
 #target_link_libraries( planner_client ${catkin_LIBRARIES} )
 #target_link_libraries( wgs84_node ${catkin_LIBRARIES} )
-# target_link_libraries( ekf_node assignment4 ${catkin_LIBRARIES} ${BFL_LIBRARIES} )
-# target_link_libraries( error_node assignment4 ${catkin_LIBRARIES} ${BFL_LIBRARIES} )
+target_link_libraries( ekf_node manip_kalman_lib ${catkin_LIBRARIES} ${BFL_LIBRARIES} )
+# target_link_libraries( error_node manip_kalman_lib ${catkin_LIBRARIES} ${BFL_LIBRARIES} )

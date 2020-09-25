@@ -38,14 +38,15 @@
 
 // bayesian filtering
 #include <bfl/filter/extendedkalmanfilter.h>
-#include <bfl/wrappers/matrix/matrix_wrapper.h>
-#include <bfl/model/linearanalyticsystemmodel_gaussianuncertainty.h>
 #include <bfl/model/linearanalyticmeasurementmodel_gaussianuncertainty.h>
+#include <bfl/model/linearanalyticsystemmodel_gaussianuncertainty.h>
 #include <bfl/pdf/analyticconditionalgaussian.h>
 #include <bfl/pdf/linearanalyticconditionalgaussian.h>
+#include <bfl/wrappers/matrix/matrix_wrapper.h>
 
-#include "system_pdf.hpp"
+#include "ekf_models.hpp"
 #include "measurement_pdf.hpp"
+#include "system_pdf.hpp"
 
 // TF
 #include <tf/tf.h>

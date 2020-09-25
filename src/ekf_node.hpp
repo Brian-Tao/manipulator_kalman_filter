@@ -10,50 +10,31 @@
 #include "ekf.hpp"
 
 // messages
-#include <geometry_msgs/Twist.h>
-#include <sensor_msgs/Imu.h>
-#include <sensor_msgs/NavSatFix.h>
-#include <geometry_msgs/PoseWithCovarianceStamped.h>
+#include <sensor_msgs/JointState.h>
 
-#include <message_filters/subscriber.h>
-#include <message_filters/time_synchronizer.h>
-#include <message_filters/sync_policies/approximate_time.h>
-
-using namespace geometry_msgs;
-using namespace sensor_msgs;
-using namespace message_filters;
 
 class EKFNode{
 
 private:
 
-  // shorthand typedefs
-  typedef Subscriber<NavSatFix>    SubscribeGPS;
-  typedef Subscriber<Imu>          SubscribeIMU;
-  typedef sync_policies::ApproximateTime<NavSatFix,Imu> Policy;
-  typedef message_filters::Synchronizer< EKFNode::Policy > Sync;
-  
-  SubscribeGPS    sub_gps;
-  SubscribeIMU    sub_imu;
-  Sync            sync;
-
   BFL::ColumnVector z;
   BFL::ColumnVector u;
-  double rate;
-  
-  ros::NodeHandle nh, nh_private;
 
-  ros::Subscriber sub_twist;
-  ros::Publisher  pub_pose;
+  double rate = 1e-3;
+  
+  ros::NodeHandle nh;
+
+  ros::Subscriber jnt_state_sub_;
+  ros::Publisher  jnt_state_pub_;
 
   EKF ekf;
   
 public:
 
-  EKFNode( ros::NodeHandle& nh, ros::NodeHandle& nhp, double rate );
+  EKFNode( ros::NodeHandle& nh, double rate );
   
-  void callback_sensors( const NavSatFix& nsf, const Imu& imu );
-  void callback_command( const Twist& vw );
+  void sensor_callback( );
+  void jnt_state_callback( const sensor_msgs::JointState::ConstPtr& msg );
   void update();
 
 };

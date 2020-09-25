@@ -1,64 +1,74 @@
 #include "ekf_node.hpp"
+#include "ekf_models.hpp"
 
- // constructor
-EKFNode::EKFNode( ros::NodeHandle& nh, ros::NodeHandle& nhp, double r ) : 
-  nh( nh ),
-  nh_private( nhp ),
-  sub_gps( nh, "fix", 2 ),
-  sub_imu( nh, "imu", 2 ),
-  sync( Policy(20), sub_gps, sub_imu ),
-  z( 6 ),
-  u(3),
-  rate(r){
-
-  sync.registerCallback( &EKFNode::callback_sensors, this );
-
-  // advertise our estimation
-  pub_pose=nh_private.advertise<PoseWithCovarianceStamped>("posterior",10);
-  sub_twist=nh.subscribe( "cmd_vel", 2, &EKFNode::callback_command, this );
-
+// constructor
+EKFNode::EKFNode(ros::NodeHandle& nh, double r) : nh(nh), z(14), u(8), rate(r) {
+    // advertise our estimation
+    u = 0;
+    u(8) = rate;
+    this->jnt_state_pub_ = nh.advertise<sensor_msgs::JointState>("posterior", 10);
+    this->jnt_state_sub_ =
+        nh.subscribe("kinova_joint_states", 1000, &EKFNode::jnt_state_callback, this);
 }
 
-// Sensor callback
-// This only copies the measurement
-void EKFNode::callback_sensors( const NavSatFix& nsf, const Imu& imu ){
+// torque callback
+void EKFNode::sensor_callback() { /* place holder for torque callback */}
 
-
-}
-
-// Velocity command callback
 // This calls the EKF with the latest measurements
-void EKFNode::callback_command( const Twist& vw ){
-  u(1) = vw.linear.x;
-  u(2) = vw.angular.z;
-  u(3) = rate;
-  if(!ekf.is_initialized())
-    {ekf.initialize();}
+void EKFNode::jnt_state_callback(const sensor_msgs::JointState::ConstPtr& msg) {
+
+    z(1) = msg->position[0];
+    z(2) = msg->position[1];
+    z(3) = msg->position[2];
+    z(4) = msg->position[3];
+    z(5) = msg->position[4];
+    z(6) = msg->position[5];
+    z(7) = msg->position[6];
+
+    z(8) = msg->velocity[0];
+    z(9) = msg->velocity[1];
+    z(10) = msg->velocity[2];
+    z(11) = msg->velocity[3];
+    z(12) = msg->velocity[4];
+    z(13) = msg->velocity[5];
+    z(14) = msg->velocity[6];
+
+    if (!ekf.is_initialized()) {
+        ekf.initialize();
+    }
 }
 
+void EKFNode::update() {
+    if (ekf.is_initialized()) {
+        ekf.update(ros::Time::now(), z, u);
+        State posterior = ekf.get_posterior();
+        sensor_msgs::JointState msg;
+        // TO be filled
+        for (int i = 0; i < 7; ++i) {
+          msg.header.stamp = ros::Time::now();
+          msg.position[i] = posterior.q[i];
+          msg.velocity[i] = posterior.qd[i];
+          msg.effort[i] = posterior.qdd[i];
+        }
 
-void EKFNode::update(){
-  if( ekf.is_initialized() ){ 
-    ekf.update( ros::Time::now(), z, u ); 
-    pub_pose.publish( ekf.get_posterior() );
-  }
+        this->jnt_state_pub_.publish(msg);
+    }
 }
 
-int main(int argc, char **argv){
-  
-  // Initialize ROS
-  ros::init(argc, argv, "EKF");
-  ros::NodeHandle nh, nhp("~");
+int main(int argc, char** argv) {
+    // Initialize ROS
+    ros::init(argc, argv, "EKF");
+    ros::NodeHandle nh;
 
-  // create filter class
-  EKFNode ekf_node( nh, nhp, 1.0/25.0 );
-  ros::Rate r(25.0);
-  
-  while(nh.ok()){
-    ekf_node.update();
-    ros::spinOnce();
-    r.sleep();
-  }
+    // create filter class
+    EKFNode ekf_node(nh, 1.0 / 1000.0);
+    ros::Rate r(1000.0);
 
-  return 0;
+    while (nh.ok()) {
+        ekf_node.update();
+        ros::spinOnce();
+        r.sleep();
+    }
+
+    return 0;
 }

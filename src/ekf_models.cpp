@@ -1,7 +1,6 @@
 
 #include "ekf_models.hpp"
 #include <tf/tf.h>
-#include "utilities.h"
 
 /**
    TODO
@@ -133,7 +132,7 @@ jnt_array meas_evaluate_jnt_pos( const State& state ){
       jnt_pos.q[i] = state.q[i];
   };
 
-  return ;
+  return jnt_pos;
 }
 
 /**

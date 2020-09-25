@@ -35,7 +35,6 @@
 /* Author: Wim Meeussen */
 
 #include "ekf.hpp"
-#include "ekf_models.hpp"
 
 using namespace MatrixWrapper;
 using namespace BFL;
