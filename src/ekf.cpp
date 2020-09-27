@@ -93,7 +93,7 @@ EKF::~EKF() {
 // initialize prior density of filter
 void EKF::initialize() {
     ColumnVector prior_Mu(21);
-    prior_Mu = 0.1;
+    prior_Mu = 0.0;
     // prior_Mu(3) = 0.23;
 
     // set a good covariance

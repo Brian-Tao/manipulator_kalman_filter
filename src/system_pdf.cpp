@@ -67,6 +67,7 @@ Matrix SystemPDF::dfGet(unsigned int i) const {
 
     ColumnVector torque = ConditionalArgumentGet(1);
     double dt = torque(8);
+    double halfdtsquare = 0.5 * dt * dt;
 
     for (int i = 1; i <= 21; ++i) {
         for (int j = i; j <= 21; ++j) {
@@ -77,7 +78,7 @@ Matrix SystemPDF::dfGet(unsigned int i) const {
                 df(i, j) = dt;
             }
             else if (j - i >= 14 and j - i < 21) {
-                df(i, j) = 0.5 * dt * dt;
+                df(i, j) = halfdtsquare;
             }else {
                 df(i, j) = 0.0;
             }
