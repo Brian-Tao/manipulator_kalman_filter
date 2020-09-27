@@ -1,42 +1,37 @@
 
 #ifndef __EKF_NODE__
 #define __EKF_NODE__
-  
+
 #include <ros/ros.h>
 #include <tf/tf.h>
-#include <tf/transform_listener.h>
 #include <tf/transform_broadcaster.h>
+#include <tf/transform_listener.h>
 
 #include "ekf.hpp"
 
 // messages
 #include <sensor_msgs/JointState.h>
 
+class EKFNode {
+ private:
+    BFL::ColumnVector z;
+    BFL::ColumnVector u;
 
-class EKFNode{
+    double rate = 1e-3;
 
-private:
+    ros::NodeHandle nh;
 
-  BFL::ColumnVector z;
-  BFL::ColumnVector u;
+    ros::Subscriber jnt_state_sub_;
+    ros::Publisher jnt_state_pub_;
 
-  double rate = 1e-3;
-  
-  ros::NodeHandle nh;
+    EKF ekf;
 
-  ros::Subscriber jnt_state_sub_;
-  ros::Publisher  jnt_state_pub_;
+ public:
+    EKFNode(ros::NodeHandle& nh, double rate);
 
-  EKF ekf;
-  
-public:
-
-  EKFNode( ros::NodeHandle& nh, double rate );
-  
-  void sensor_callback( );
-  void jnt_state_callback( const sensor_msgs::JointState::ConstPtr& msg );
-  void update();
-
+    void sensor_callback();
+    void jnt_state_callback(const sensor_msgs::JointState::ConstPtr& msg);
+    void update();
 };
 
 #endif

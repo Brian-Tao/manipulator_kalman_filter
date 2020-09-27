@@ -16,73 +16,59 @@
 //
 
 #include "measurement_pdf.hpp"
-#include "ekf_models.hpp"
-#include <bfl/wrappers/rng/rng.h> // Wrapper around several rng libraries
+
+#include <bfl/wrappers/rng/rng.h>  // Wrapper around several rng libraries
 #include <tf/tf.h>
 
-namespace BFL
-{
+#include "ekf_models.hpp"
 
-  using namespace MatrixWrapper;
-  
-  MeasurementPDF::MeasurementPDF( const Gaussian& additiveNoise )
-    : AnalyticConditionalGaussianAdditiveNoise( additiveNoise ){}
-  
-  MeasurementPDF::~MeasurementPDF(){}
+namespace BFL {
 
-  ColumnVector MeasurementPDF::ExpectedValueGet() const{
+using namespace MatrixWrapper;
 
+MeasurementPDF::MeasurementPDF(const Gaussian& additiveNoise)
+    : AnalyticConditionalGaussianAdditiveNoise(additiveNoise) {}
+
+MeasurementPDF::~MeasurementPDF() {}
+
+ColumnVector MeasurementPDF::ExpectedValueGet() const {
     ColumnVector state = ConditionalArgumentGet(0);
-
-    // copy to the state
-    State state_in;
-    for( size_t i=1; i<=7; i++ ){ 
-      state_in.q[i - 1] = state(i);
-      state_in.qd[i + 6] = state(i + 7);
-      state_in.qdd[i + 13] = state(i + 14); 
-    }
-
-    // Call the state prediction
-    jnt_array jnt_pos  = meas_evaluate_jnt_pos( state_in );
-    jnt_array jnt_vel = meas_evaluate_jnt_vel( state_in );
-    
-    // copy to the state
     ColumnVector z(14);
-    
-    for (int i = 1; i <= 7; ++i) {
-      z(i) = jnt_pos.q[i - 1];
-      z(i + 7) = jnt_vel.q[i - 1];
+    z = 0.0;
+
+    for (int i = 1; i <= 14; ++i) {
+        z(i) = state(i);
     }
-    
+
     return z;
+}
 
-  }
-  
-  Matrix MeasurementPDF::dfGet(unsigned int i) const{
-
-    Matrix df( 14, 21 );
+Matrix MeasurementPDF::dfGet(unsigned int i) const {
+    Matrix df(14, 21);
     df = 0;
 
+    for (int i = 1; i <= 14; ++i) {
+        df(i, i) = 1.0;
+    }
+
     return df;
+}
 
-  }
-
-  MatrixWrapper::SymmetricMatrix MeasurementPDF::CovarianceGet() const{
-
+MatrixWrapper::SymmetricMatrix MeasurementPDF::CovarianceGet() const {
     ColumnVector state = ConditionalArgumentGet(0);
 
     // copy to the state
     State state_in;
     for (size_t i = 1; i <= 7; i++) {
         state_in.q[i - 1] = state(i);
-        state_in.qd[i + 6] = state(i + 7);
-        state_in.qdd[i + 13] = state(i + 14);
+        state_in.qd[i - 1] = state(i + 7);
+        state_in.qdd[i - 1] = state(i + 14);
     }
 
     double R[14][14];
-    meas_evaluate_R( R, state_in );
-    
-    SymmetricMatrix measR( 14, 14 );
+    meas_evaluate_R(R, state_in);
+
+    SymmetricMatrix measR(14, 14);
     for (int r = 1; r <= 14; r++) {
         for (int c = 1; c <= 14; c++) {
             measR(r, c) = R[r - 1][c - 1];
@@ -90,7 +76,6 @@ namespace BFL
     }
 
     return measR;
-  }
-  
-}//namespace BFL
+}
 
+}  // namespace BFL

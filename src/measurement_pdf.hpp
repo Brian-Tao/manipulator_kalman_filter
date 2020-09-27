@@ -4,23 +4,20 @@
 
 #include <bfl/pdf/analyticconditionalgaussian_additivenoise.h>
 
-namespace BFL
-{
+namespace BFL {
 
-  class MeasurementPDF : public AnalyticConditionalGaussianAdditiveNoise{
+class MeasurementPDF : public AnalyticConditionalGaussianAdditiveNoise {
+ public:
+    MeasurementPDF(const Gaussian& additiveNoise);
 
-  public:
-    
-    MeasurementPDF( const Gaussian& additiveNoise );
-    
     virtual ~MeasurementPDF();
-    
-    // redefine virtual functions
-    virtual MatrixWrapper::ColumnVector  ExpectedValueGet()    const;
-    virtual MatrixWrapper::Matrix        dfGet(unsigned int i) const;
-    virtual MatrixWrapper::SymmetricMatrix CovarianceGet()     const;
-  };
-  
-} // End namespace BFL
 
-#endif //  
+    // redefine virtual functions
+    virtual MatrixWrapper::ColumnVector ExpectedValueGet() const;
+    virtual MatrixWrapper::Matrix dfGet(unsigned int i) const;
+    virtual MatrixWrapper::SymmetricMatrix CovarianceGet() const;
+};
+
+}  // End namespace BFL
+
+#endif  //
