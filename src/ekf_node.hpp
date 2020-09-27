@@ -26,6 +26,8 @@ class EKFNode {
 
     EKF ekf;
 
+    bool isLastPositionSet = false;
+
  public:
     EKFNode(ros::NodeHandle& nh, double rate);
 

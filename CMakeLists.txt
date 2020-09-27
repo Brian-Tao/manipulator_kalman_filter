@@ -7,12 +7,8 @@ project(manip_kalman)
 find_package(catkin REQUIRED COMPONENTS
   roscpp
   tf
-  nav_msgs
   std_msgs
-  geometry_msgs
   sensor_msgs
-  message_generation
-  message_filters
   )
 
 find_package(PkgConfig)

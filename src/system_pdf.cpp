@@ -70,8 +70,16 @@ Matrix SystemPDF::dfGet(unsigned int i) const {
 
     for (int i = 1; i <= 21; ++i) {
         for (int j = i; j <= 21; ++j) {
-            if (i == j) {
+            if (j - i < 7) {
                 df(i, j) = 1.0;
+            }
+            else if (j - i >= 7 and j - i < 14) {
+                df(i, j) = dt;
+            }
+            else if (j - i >= 14 and j - i < 21) {
+                df(i, j) = 0.5 * dt * dt;
+            }else {
+                df(i, j) = 0.0;
             }
         }
     }

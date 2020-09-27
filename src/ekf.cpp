@@ -51,7 +51,7 @@ EKF::EKF() : prior_(NULL), filter_(NULL), initialized(false) {
 
     // process_covariance( C );
     for (int r = 1; r <= 21; r++) {
-        sysNoise_Cov(r, r) = 1e-5;
+        sysNoise_Cov(r, r) = 1e-1;
     }
 
     Gaussian system_Uncertainty(sysNoise_Mu, sysNoise_Cov);
@@ -66,7 +66,7 @@ EKF::EKF() : prior_(NULL), filter_(NULL), initialized(false) {
 
     // measurement_covariance( C );
     for (int r = 1; r <= 14; r++) {
-        measNoise_Cov(r, r) = 1e-4;
+        measNoise_Cov(r, r) = 1e-2;
     }
 
     Gaussian measurement_Uncertainty(measNoise_Mu, measNoise_Cov);
@@ -93,7 +93,7 @@ EKF::~EKF() {
 // initialize prior density of filter
 void EKF::initialize() {
     ColumnVector prior_Mu(21);
-    prior_Mu = 0.0;
+    prior_Mu = 0.1;
     // prior_Mu(3) = 0.23;
 
     // set a good covariance
@@ -141,11 +141,10 @@ bool EKF::update(const ros::Time& filter_time, const ColumnVector& z, const Colu
     }
     ROS_DEBUG("Update filter at time %f with dt %f", filter_time.toSec(), dt);
     */
-    std::cout << u(1) << " " << u(8) << std::endl;
-    std::cout << z(1) << " " << z(8) << std::endl;
+    // std::cout << u(1) << " " << u(8) << std::endl;
+    // std::cout << z(1) << " " << z(8) << std::endl;
     filter_->Update(sys_model_, u, meas_model_, z);
     filter_time_old = filter_time;
-    std::cout << "finish update" << std::endl;
 
     return true;
 }

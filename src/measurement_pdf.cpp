@@ -48,7 +48,13 @@ Matrix MeasurementPDF::dfGet(unsigned int i) const {
     df = 0;
 
     for (int i = 1; i <= 14; ++i) {
-        df(i, i) = 1.0;
+        for (int j = 1; j <= 21; ++j) {
+            if (i == j) {
+                df(i, j) = 1.0;
+            }else {
+                df(i, j) = 0.0; 
+            }
+        }
     }
 
     return df;
