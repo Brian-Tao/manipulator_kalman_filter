@@ -42,7 +42,6 @@ ColumnVector SystemPDF::ExpectedValueGet() const {
     for (size_t i = 1; i <= 7; i++) {
         state_in.q[i - 1] = state(i);
         state_in.qd[i - 1] = state(i + 7);
-        state_in.qdd[i - 1] = state(i + 14);
     }
 
     // Call the state prediction
@@ -52,7 +51,6 @@ ColumnVector SystemPDF::ExpectedValueGet() const {
     for (size_t i = 1; i <= 7; i++) {
         state(i) = state_out.q[i - 1];
         state(i + 7) = state_out.qd[i - 1];
-        state(i + 14) = state_out.qdd[i - 1];
     }
 
     return state;
@@ -62,24 +60,22 @@ ColumnVector SystemPDF::ExpectedValueGet() const {
 // Argument 0 is set to x (posterior expected value)
 // Argument 1 is set to u
 Matrix SystemPDF::dfGet(unsigned int i) const {
-    Matrix df(21, 21);
+    Matrix df(14, 14);
     df = 0.0;
 
     ColumnVector torque = ConditionalArgumentGet(1);
     double dt = torque(8);
-    double halfdtsquare = 0.5 * dt * dt;
+    // double halfdtsquare = 0.5 * dt * dt;
 
-    for (int i = 1; i <= 21; ++i) {
-        for (int j = i; j <= 21; ++j) {
+    for (int i = 1; i <= 14; ++i) {
+        for (int j = i; j <= 14; ++j) {
             if (j - i < 7) {
                 df(i, j) = 1.0;
             }
             else if (j - i >= 7 and j - i < 14) {
                 df(i, j) = dt;
             }
-            else if (j - i >= 14 and j - i < 21) {
-                df(i, j) = halfdtsquare;
-            }else {
+            else {
                 df(i, j) = 0.0;
             }
         }
@@ -97,15 +93,14 @@ MatrixWrapper::SymmetricMatrix SystemPDF::CovarianceGet() const {
     for (size_t i = 1; i <= 7; i++) {
         state_in.q[i - 1] = state(i);
         state_in.qd[i - 1] = state(i + 7);
-        state_in.qdd[i - 1] = state(i + 14);
     }
 
-    double Q[21][21];
+    double Q[14][14];
     sys_evaluate_Q(Q, state_in, torque(8));
 
-    SymmetricMatrix sysQ(21, 21);
-    for (int r = 1; r <= 21; r++) {
-        for (int c = 1; c <= 21; c++) {
+    SymmetricMatrix sysQ(14, 14);
+    for (int r = 1; r <= 14; r++) {
+        for (int c = 1; c <= 14; c++) {
             sysQ(r, c) = Q[r - 1][c - 1];
         }
     }

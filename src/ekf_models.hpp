@@ -41,7 +41,7 @@ struct State {
    \param state_in    The current state estimate
    \param dt          Delta time
 */
-void sys_evaluate_Q(double Q[21][21], const State& state, double dt);
+void sys_evaluate_Q(double Q[14][14], const State& state, double dt);
 
 /**
    Fill in the value of the measurement covariance matrix. The

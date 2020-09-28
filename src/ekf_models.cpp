@@ -11,10 +11,10 @@
    \param state_in    The current state estimate
    \param dt          Delta time
 */
-void sys_evaluate_Q(double Q[21][21], const State& state, double dt) {
+void sys_evaluate_Q(double Q[14][14], const State& state, double dt) {
     // TODO fill in the matrix Q
-    for (int i = 0; i < 21; ++i) {
-        for (int j = 0; j < 21; ++j) {
+    for (int i = 0; i < 14; ++i) {
+        for (int j = 0; j < 14; ++j) {
             if (i == j) {
                 Q[i][j] = 1.0;
             } else {
@@ -24,39 +24,31 @@ void sys_evaluate_Q(double Q[21][21], const State& state, double dt) {
     }
 
     // joint position variance
-    Q[0][0] = 1e-5;
-    Q[1][1] = 1e-5;
-    Q[2][2] = 1e-5;
-    Q[3][3] = 1e-5;
-    Q[4][4] = 1e-5;
-    Q[5][5] = 1e-5;
-    Q[6][6] = 1e-5;
+    Q[0][0] = 0.1;
+    Q[1][1] = 0.1;
+    Q[2][2] = 0.1;
+    Q[3][3] = 0.1;
+    Q[4][4] = 0.1;
+    Q[5][5] = 0.1;
+    Q[6][6] = 0.1;
 
     // joint velocity variance
-    Q[7][7] = 1;
-    Q[8][8] = 1;
-    Q[9][9] = 1;
-    Q[10][10] = 1;
-    Q[11][11] = 1;
-    Q[12][12] = 1;
-    Q[13][13] = 1;
+    Q[7][7] = 0.1;
+    Q[8][8] = 0.1;
+    Q[9][9] = 0.1;
+    Q[10][10] = 0.1;
+    Q[11][11] = 0.1;
+    Q[12][12] = 0.1;
+    Q[13][13] = 0.1;
 
     // joint acceleration variance
-    Q[14][14] = 10.0;
-    Q[15][15] = 10.0;
-    Q[16][16] = 10.0;
-    Q[17][17] = 10.0;
-    Q[18][18] = 10.0;
-    Q[19][19] = 10.0;
-    Q[20][20] = 10.0;
-
-    Q[14][14] = 1e-4;
-    Q[15][15] = 1e-4;
-    Q[16][16] = 1e-4;
-    Q[17][17] = 1e-4;
-    Q[18][18] = 1e-4;
-    Q[19][19] = 1e-4;
-    Q[20][20] = 1e-4;
+    // Q[14][14] = 10.0;
+    // Q[15][15] = 10.0;
+    // Q[16][16] = 10.0;
+    // Q[17][17] = 10.0;
+    // Q[18][18] = 10.0;
+    // Q[19][19] = 10.0;
+    // Q[20][20] = 10.0;
 }
 
 /**
@@ -79,22 +71,31 @@ void meas_evaluate_R(double R[14][14], const State& state) {
     }
 
     // joint position measurement variance
-    R[0][0] = 1e-5;
-    R[1][1] = 1e-5;
-    R[2][2] = 1e-5;
-    R[3][3] = 1e-5;
-    R[4][4] = 1e-5;
-    R[5][5] = 1e-5;
-    R[6][6] = 1e-5;
+    R[0][0] = 1e-2;
+    R[1][1] = 1e-2;
+    R[2][2] = 1e-2;
+    R[3][3] = 1e-2;
+    R[4][4] = 1e-2;
+    R[5][5] = 1e-2;
+    R[6][6] = 1e-2;
 
     // joint velocity measurement variance
-    R[7][7] = 1;
-    R[8][8] = 1;
-    R[9][9] = 1;
-    R[10][10] = 1;
-    R[11][11] = 1;
-    R[12][12] = 1;
-    R[13][13] = 1;
+    R[7][7] = 10;
+    R[8][8] = 10;
+    R[9][9] = 10;
+    R[10][10] = 10;
+    R[11][11] = 10;
+    R[12][12] = 10;
+    R[13][13] = 10;
+
+    // joint acceleration measurement variance
+    // R[14][14] = 10.0;
+    // R[15][15] = 10.0;
+    // R[16][16] = 10.0;
+    // R[17][17] = 10.0;
+    // R[18][18] = 10.0;
+    // R[19][19] = 10.0;
+    // R[20][20] = 10.0;
 }
 
 /**
@@ -110,9 +111,8 @@ State sys_evaluate_g(const State& state_in, double dt) {
     State state_out;
 
     for (int i = 0; i < 7; ++i) {
-        state_out.q[i] = state_in.q[i] + dt * state_in.qd[i] + 0.5 * dt * dt * state_in.qdd[i];
-        state_out.qd[i] = state_in.qd[i] + dt * state_in.qdd[i];
-        state_out.qdd[i] = state_in.qdd[i];
+        state_out.q[i] = state_in.q[i] + dt * state_in.qd[i];
+        state_out.qd[i] = state_in.qd[i];
     }
 
     return state_out;

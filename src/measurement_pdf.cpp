@@ -44,11 +44,11 @@ ColumnVector MeasurementPDF::ExpectedValueGet() const {
 }
 
 Matrix MeasurementPDF::dfGet(unsigned int i) const {
-    Matrix df(14, 21);
+    Matrix df(14, 14);
     df = 0;
 
     for (int i = 1; i <= 14; ++i) {
-        for (int j = 1; j <= 21; ++j) {
+        for (int j = 1; j <= 14; ++j) {
             if (i == j) {
                 df(i, j) = 1.0;
             }else {
@@ -68,7 +68,6 @@ MatrixWrapper::SymmetricMatrix MeasurementPDF::CovarianceGet() const {
     for (size_t i = 1; i <= 7; i++) {
         state_in.q[i - 1] = state(i);
         state_in.qd[i - 1] = state(i + 7);
-        state_in.qdd[i - 1] = state(i + 14);
     }
 
     double R[14][14];

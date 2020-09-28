@@ -3,6 +3,7 @@
 #include "ekf_models.hpp"
 
 double last_position[7] = {0, 0, 0, 0, 0, 0, 0};
+double last_velocity[7] = {0, 0, 0, 0, 0, 0, 0};
 double position[7] = {0, 0, 0, 0, 0, 0, 0};
 
 // constructor
@@ -31,7 +32,7 @@ void EKFNode::jnt_state_callback(const sensor_msgs::JointState::ConstPtr& msg) {
         return;
     }
 
-
+    // deal with sudden change from 0 to 360
     for (int i = 0; i < 7; ++i) {
         position[i] = msg->position[i];
         if (fabs(position[i] - last_position[i]) > 350) {
@@ -82,7 +83,7 @@ void EKFNode::update() {
             msg.header.stamp = ros::Time::now();
             msg.position[i] = posterior.q[i];
             msg.velocity[i] = posterior.qd[i];
-            msg.effort[i] = posterior.qdd[i];
+            // msg.effort[i] = posterior.qdd[i];
         }
 
         this->jnt_state_pub_.publish(msg);

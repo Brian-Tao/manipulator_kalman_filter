@@ -44,13 +44,13 @@ using namespace std;
 // constructor
 EKF::EKF() : prior_(NULL), filter_(NULL), initialized(false) {
     // create system model
-    ColumnVector sysNoise_Mu(21);
+    ColumnVector sysNoise_Mu(14);
     sysNoise_Mu = 0;
-    SymmetricMatrix sysNoise_Cov(21);
+    SymmetricMatrix sysNoise_Cov(14);
     sysNoise_Cov = 0;
 
     // process_covariance( C );
-    for (int r = 1; r <= 21; r++) {
+    for (int r = 1; r <= 14; r++) {
         sysNoise_Cov(r, r) = 1e-1;
     }
 
@@ -66,7 +66,7 @@ EKF::EKF() : prior_(NULL), filter_(NULL), initialized(false) {
 
     // measurement_covariance( C );
     for (int r = 1; r <= 14; r++) {
-        measNoise_Cov(r, r) = 1e-2;
+        measNoise_Cov(r, r) = 1.0;
     }
 
     Gaussian measurement_Uncertainty(measNoise_Mu, measNoise_Cov);
@@ -92,15 +92,15 @@ EKF::~EKF() {
 
 // initialize prior density of filter
 void EKF::initialize() {
-    ColumnVector prior_Mu(21);
+    ColumnVector prior_Mu(14);
     prior_Mu = 0.0;
     // prior_Mu(3) = 0.23;
 
     // set a good covariance
-    SymmetricMatrix prior_Cov(21);
+    SymmetricMatrix prior_Cov(14);
     prior_Cov = 0.0;
-    for (unsigned int i = 1; i <= 21; i++) {
-        for (unsigned int j = 1; j <= 21; j++) {
+    for (unsigned int i = 1; i <= 14; i++) {
+        for (unsigned int j = 1; j <= 14; j++) {
             if (i == j) {
                 prior_Cov(i, j) = 1.0;
             }
@@ -123,7 +123,6 @@ State EKF::get_posterior() const {
     for (int i = 1; i <= 7; ++i) {
         res.q[i - 1] = mu(i);
         res.qd[i - 1] = mu(i + 7);
-        res.qdd[i - 1] = mu(i + 14);
     }
 
     return res;
